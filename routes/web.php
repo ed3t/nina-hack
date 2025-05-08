@@ -1,6 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +14,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/users/create', [UserController::class, 'edit'])->name('users.create');
+Route::post('/users', [UserController::class, 'store'])->name('users.store');
+Route::put('/users/update/{id}', [UserController::class, 'update'])->name('users.update');
+Route::get('/', [UserController::class, 'index'])->name('users.index');
+Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+Route::get('/search', [UserController::class, 'search'])->name('users.search');
