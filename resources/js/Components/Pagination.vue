@@ -70,6 +70,7 @@ export default {
         users: Object,
         sortColumn: String,
         sortDirection: String,
+        pageSize: Number,
     },
     computed: {
         pageNumbers() {
@@ -100,6 +101,7 @@ export default {
                     page: page,
                     sortColumn: this.sortColumn,
                     sortDirection: this.sortDirection,
+                    pageSize: this.pageSize,
                 });
             }
         },

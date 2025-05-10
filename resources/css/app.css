@@ -136,31 +136,3 @@ input:focus {
   color: #747474;
 }
 
-.select:not(.is-multiple):not(.is-loading)::after {
-  border: 3px solid transparent;
-  border-radius: 2px;
-  border-right: 0;
-  border-top: 0;
-  content: ' ';
-  display: block;
-  height: 0.625em;
-  margin-top: -0.4375em;
-  pointer-events: none;
-  position: absolute;
-  top: 48%;
-  -webkit-transform: rotate(-45deg);
-  transform: rotate(-45deg);
-  -webkit-transform-origin: center;
-  transform-origin: center;
-  width: 0.625em;
-}
-
-.select:not(.is-multiple):not(.is-loading)::after {
-  right: 1.125em;
-  z-index: 4;
-}
-
-.select:not(.is-multiple):not(.is-loading)::after {
-  border-color: #bdbdbd;
-  border-width: 1.4px;
-}

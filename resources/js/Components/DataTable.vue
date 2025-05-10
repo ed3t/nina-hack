@@ -18,6 +18,7 @@ const props = defineProps({
     handleSort: Function,
     sortColumn: String,
     sortDirection: String,
+    pageSize: Number,
     handleDelete: Function,
     handlePageSizeChange: Function,
 });
@@ -74,7 +75,7 @@ const handlePageSizeChange = (e) => {
                 <span class="is-index cursor-pointer" @click="handleSort('id')">
                     No.
                     <figure
-                        class="ml-2 text-primary"
+                        class="ml-2 text-indigo-500"
                         v-if="sortColumn === 'id'"
                     >
                         {{ sortDirection === "asc" ? "↑" : "↓" }}
@@ -86,7 +87,7 @@ const handlePageSizeChange = (e) => {
                 >
                     Full Name
                     <figure
-                        class="ml-2 text-primary"
+                        class="ml-2 text-indigo-500"
                         v-if="sortColumn === 'first_name'"
                     >
                         {{ sortDirection === "asc" ? "↑" : "↓" }}
@@ -97,7 +98,7 @@ const handlePageSizeChange = (e) => {
                     @click="handleSort('email')"
                     >Email
                     <figure
-                        class="ml-2 text-primary"
+                        class="ml-2 text-indigo-500"
                         v-if="sortColumn === 'email'"
                     >
                         {{ sortDirection === "asc" ? "↑" : "↓" }}
@@ -107,7 +108,7 @@ const handlePageSizeChange = (e) => {
                 <span class="cursor-pointer" @click="handleSort('created_at')"
                     >Created
                     <figure
-                        class="ml-2 text-primary"
+                        class="ml-2 text-indigo-500"
                         v-if="sortColumn === 'created_at'"
                     >
                         {{ sortDirection === "asc" ? "↑" : "↓" }}
@@ -168,6 +169,7 @@ const handlePageSizeChange = (e) => {
                 :users="users"
                 :sortColumn="sortColumn"
                 :sortDirection="sortDirection"
+                :pageSize="pageSize"
             />
         </div>
     </div>

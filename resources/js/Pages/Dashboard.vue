@@ -27,6 +27,13 @@ const currentPage = ref(props.users.current_page);
 const searchQuery = ref("");
 const loading = ref(false);
 
+const defaultOptions = {
+    page: currentPage.value,
+    pageSize: pageSize.value,
+    sortColumn: sortColumn.value,
+    sortDirection: sortDirection.value,
+};
+
 const debouncedSearch = debounce(searchUsers, 300);
 
 async function searchUsers() {
@@ -49,61 +56,66 @@ async function searchUsers() {
     }
 }
 
-const viewUser = (userId) => Inertia.get(route('users.show', { id: userId }));
-const editUser = (userId) => Inertia.get(route('users.edit', { id: userId }));
+const viewUser = (userId) => Inertia.get(route("users.show", { id: userId }));
+const editUser = (userId) => Inertia.get(route("users.edit", { id: userId }));
 
 const handleSort = (column) => {
-  if (column === sortColumn.value) {
-    sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
-  } else {
-    sortColumn.value = column;
-    sortDirection.value = "asc";
-  }
+    if (column === sortColumn.value) {
+        sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
+    } else {
+        sortColumn.value = column;
+        sortDirection.value = "asc";
+    }
 
-  loading.value = true;
+    loading.value = true;
 
-  Inertia.get("/", {
-    page: users.value.current_page,
-    sortColumn: sortColumn.value,
-    sortDirection: sortDirection.value,
-  }, {
-    onFinish: () => {
-      loading.value = false;
-    },
-  });
+    Inertia.get("/", {
+        page: currentPage.value,
+            pageSize: pageSize.value,
+            sortColumn: sortColumn.value,
+            sortDirection: sortDirection.value,
+    }, {
+        onFinish: () => {
+            loading.value = false;
+        },
+    });
 };
 const handleDelete = (id) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
     loading.value = true;
-    form.delete(route('users.destroy', { id }), {
+    form.delete(route("users.destroy", { id }), {
         preserveScroll: true,
         onSuccess: () => {
-            toast.success('Deleted successfully!');
-            Inertia.get("/")
+            toast.success("Deleted successfully!");
+            Inertia.get("/", defaultOptions);
             loading.value = false;
         },
         onError: () => {
             loading.value = false;
-            toast.error('Failed to delete user.');
-        }
+            toast.error("Failed to delete user.");
+        },
     });
 };
 const handlePageSizeChange = (newPageSize) => {
-  pageSize.value = newPageSize;
-  currentPage.value = 1;
+    pageSize.value = newPageSize;
+    currentPage.value = 1;
 
-  loading.value = true;
+    loading.value = true;
 
-  Inertia.get("/", {
-    page: currentPage.value,
-    pageSize: pageSize.value,
-    sortColumn: sortColumn.value,
-    sortDirection: sortDirection.value,
-  }, {
-    onFinish: () => {
-      loading.value = false;
-    },
-  });
+    Inertia.get(
+        "/",
+        {
+            page: currentPage.value,
+            pageSize: pageSize.value,
+            sortColumn: sortColumn.value,
+            sortDirection: sortDirection.value,
+        },
+        {
+            onFinish: () => {
+                loading.value = false;
+            },
+        },
+    );
 };
 </script>
 

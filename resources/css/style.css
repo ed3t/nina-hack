@@ -673,7 +673,7 @@ h6 {
 }
 
 .pagination li.active {
-  background: #ff6304 !important;
+  background: rgb(129 140 248 / var(--tw-bg-opacity, 1)) !important;
 }
 
 .pagination li.active a {

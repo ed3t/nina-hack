@@ -11,7 +11,7 @@
             <span>{{ user.first_name }} {{ user.last_name }}</span>
         </div>
         <div class="flex-table-cell is-grow" data-th="Email">
-            <span class="light-text">{{ user.email }}</span>
+            <span class="light-text">{{ truncateText(user.email) }}</span>
         </div>
         <div class="flex-table-cell" data-th="Country">
             <span class="light-text">{{ user.address.country }}</span>
@@ -89,6 +89,14 @@ export default {
             };
 
             return date.toLocaleString("en-US", options);
+        },
+        truncateText() {
+            return (text) => {
+                if (text.length > 20) {
+                    return text.substring(0, 20) + "...";
+                }
+                return text;
+            };
         },
     },
     methods: {},

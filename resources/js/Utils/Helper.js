@@ -1,6 +1,3 @@
-import {usePage} from "@inertiajs/vue3";
-import {push} from "notivue";
-
 export function truncateString(str, maxLength = 10) {
     if (str.length <= maxLength) {
         return str;
@@ -21,12 +18,4 @@ export function formatDatetime(datetime) {
     };
 
     return date.toLocaleString('en-US', options);
-}
-
-export function showToast() {
-    if (usePage().props.flash.isSuccess) {
-        push.success(usePage().props.flash.message)
-    } else {
-        push.error(usePage().props.flash.message)
-    }
 }
