@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // Increase memory limit for seeding
-        ini_set('memory_limit', '1G');
+        ini_set('memory_limit', '3G');
         // Disable query log to improve performance
         DB::disableQueryLog();
 
