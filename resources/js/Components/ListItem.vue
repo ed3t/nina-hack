@@ -5,7 +5,7 @@
         </div>
         <div
             class="flex-table-cell cursor-pointer is-grow"
-            @click="viewUser(user.id)"
+            @click="viewUser(base64UrlEncode(user.id.toString()))"
             data-th="Full Name"
         >
             <span>{{ user.first_name }} {{ user.last_name }}</span>
@@ -20,7 +20,7 @@
             <span class="light-text">{{ formattedCreatedAt }}</span>
         </div>
         <div class="flex-table-cell cell-end action">
-            <button @click="editUser(user.id)" title="Edit">
+            <button @click="editUser(base64UrlEncode(user.id.toString()))" title="Edit">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -41,7 +41,7 @@
             <button
                 data-action="delete"
                 title="Delete"
-                @click="handleDelete(user.id)"
+                @click="handleDelete(base64UrlEncode(user.id.toString()))"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -98,6 +98,12 @@ export default {
                 return text;
             };
         },
+        base64UrlEncode() {
+            return (str) => {
+                const base64 = btoa(str);
+                return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+            };
+        }
     },
     methods: {},
 };

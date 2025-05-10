@@ -19,3 +19,22 @@ export function formatDatetime(datetime) {
 
     return date.toLocaleString('en-US', options);
 }
+
+export function base64UrlEncode(str) {
+    const base64 = btoa(str);
+
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+};
+
+export function base64UrlDecode(encodedStr) {
+    let base64 = encodedStr
+        .replace(/-/g, '+')
+        .replace(/_/g, '/');
+
+    const padding = base64.length % 4;
+    if (padding) {
+        base64 += '='.repeat(4 - padding);
+    }
+
+    return atob(base64);
+};

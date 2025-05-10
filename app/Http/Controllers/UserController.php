@@ -12,6 +12,21 @@ use Validator;
 
 class UserController extends Controller
 {
+    // Helper function to decode user ID
+    protected function decodeUserId($encodedId)
+    {
+        // Replace - with + and _ with / for base64 decoding
+        $base64 = strtr($encodedId, '-_', '+/');
+
+        // Add padding if necessary
+        $padding = strlen($base64) % 4;
+        if ($padding) {
+            $base64 .= str_repeat('=', 4 - $padding);
+        }
+
+        return base64_decode($base64);
+    }
+
     // Helper method for validation
     protected function validateUser(Request $request, $userId = null)
     {
@@ -67,7 +82,6 @@ class UserController extends Controller
             });
     }
 
-
     public function index(Request $request)
     {
         $search = $request->get('search');
@@ -104,13 +118,14 @@ class UserController extends Controller
         return Redirect::route('users.index')->with('success', 'User updated successfully!');
     }
 
-    public function update(Request $request, $id): RedirectResponse
+    public function update(Request $request, $encryptedId): RedirectResponse
     {
+        $id = $this->decodeUserId($encryptedId);
         // Validate user input
         $validated = $this->validateUser($request, $id);
 
         if ($validated->fails()) {
-            return Redirect::route('users.edit', $id)
+            return Redirect::route('users.edit', $encryptedId)
                 ->withErrors($validated)
                 ->withInput();
         }
@@ -120,12 +135,13 @@ class UserController extends Controller
         // Save the user
         $user = $this->saveUser($request, $id);
 
-        return Redirect::route('users.edit', $id)->with('success', 'User updated successfully!')
+        return Redirect::route('users.edit', $encryptedId)->with('success', 'User updated successfully!')
             ->with('user', $user);
     }
 
-    public function destroy($id): RedirectResponse
+    public function destroy($encryptedId): RedirectResponse
     {
+        $id = $this->decodeUserId($encryptedId);
         $user = User::findOrFail($id);
 
         $user->address()->delete();
@@ -147,20 +163,23 @@ class UserController extends Controller
         ]);
     }
 
-    public function edit(User $user)
+    public function show($encryptedId)
     {
-        $user = User::with('address')->findOrFail($user->id);
-        return Inertia::render('UserForm', [
-            'user' => $user
-        ]);
-    }
-
-    public function show($id)
-    {
+        $id = $this->decodeUserId($encryptedId);
         $user = User::with('address')->findOrFail($id);
 
         return Inertia::render('UserDetails', [
             'user' => $user,
+        ]);
+    }
+
+    public function edit($encryptedId)
+    {
+        $id = $this->decodeUserId($encryptedId);
+        $user = User::with('address')->findOrFail($id);
+
+        return Inertia::render('UserForm', [
+            'user' => $user
         ]);
     }
 

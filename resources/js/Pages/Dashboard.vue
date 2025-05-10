@@ -56,8 +56,8 @@ async function searchUsers() {
     }
 }
 
-const viewUser = (userId) => Inertia.get(route("users.show", { id: userId }));
-const editUser = (userId) => Inertia.get(route("users.edit", { id: userId }));
+const viewUser = (userId) => Inertia.get(route("users.show", { encryptedId: userId }));
+const editUser = (userId) => Inertia.get(route("users.edit", { encryptedId: userId }));
 
 const handleSort = (column) => {
     if (column === sortColumn.value) {
@@ -69,16 +69,20 @@ const handleSort = (column) => {
 
     loading.value = true;
 
-    Inertia.get("/", {
-        page: currentPage.value,
+    Inertia.get(
+        "/",
+        {
+            page: currentPage.value,
             pageSize: pageSize.value,
             sortColumn: sortColumn.value,
             sortDirection: sortDirection.value,
-    }, {
-        onFinish: () => {
-            loading.value = false;
         },
-    });
+        {
+            onFinish: () => {
+                loading.value = false;
+            },
+        },
+    );
 };
 const handleDelete = (id) => {
     if (!confirm("Are you sure you want to delete this user?")) return;

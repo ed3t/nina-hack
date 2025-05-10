@@ -5,6 +5,7 @@ import { useToast } from "vue-toastification";
 import { useForm, Head } from "@inertiajs/inertia-vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import countries from "@/Data/countries.json";
+import { base64UrlEncode } from "@/Utils/Helper";
 
 const submitLoading = ref(false);
 
@@ -34,7 +35,7 @@ const isEdit = computed(() => !!props.user && !!props.user.id);
 function submitForm() {
     submitLoading.value = true;
     if (isEdit.value) {
-        form.put(`/users/update/${props.user.id}`, {
+        form.put(route("users.update", { encryptedId: base64UrlEncode(props.user.id.toString()) }), {
             onSuccess: () => {
                 toast.success("User updated successfully!");
                 submitLoading.value = false;
@@ -46,7 +47,7 @@ function submitForm() {
             },
         });
     } else {
-        form.post("/users/store", {
+        form.post(route("users.store"), {
             onSuccess: () => {
                 toast.success("User created successfully!");
                 submitLoading.value = false;
@@ -172,7 +173,7 @@ function submitForm() {
                                 v-model="form.country"
                                 class="col-start-1 row-start-1 w-full appearance-none rounded-xl bg-white py-1.5 pl-3 pr-8 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-1 focus:-outline-offset-1 focus:outline-indigo-600 sm:text-sm/6"
                             >
-                            <option value="">Select a country</option>
+                                <option value="">Select a country</option>
                                 <option
                                     v-for="(country, index) in countries"
                                     :key="index"
@@ -181,10 +182,6 @@ function submitForm() {
                                     {{ country }}
                                 </option>
                             </select>
-                            <ChevronDownIcon
-                                class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
-                                aria-hidden="true"
-                            />
                             <small
                                 v-if="form.errors.country"
                                 class="text-pink-500"
@@ -262,12 +259,12 @@ function submitForm() {
                         </div>
                     </div>
                 </div>
-                <div class="mt-6 flex items-center justify-end gap-x-6">
+                <div class="mt-6 flex justify-end gap-x-6">
                     <button
                         :disabled="formDisabled || submitLoading"
                         :class="[
                             'rounded-full bg-indigo-600 px-3 py-2 text-md font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
-                            submitLoading ? 'is-loading' : '',
+                            submitLoading ? 'is-loading relative' : '',
                         ]"
                         type="submit"
                     >

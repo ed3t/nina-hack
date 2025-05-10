@@ -2,14 +2,14 @@
 import { Inertia } from "@inertiajs/inertia";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import PageLoader from "@/Components/PageLoader.vue";
-import { formatDatetime } from "@/Utils/Helper";
+import { formatDatetime, base64UrlEncode } from "@/Utils/Helper";
 import { Head } from "@inertiajs/inertia-vue3";
 
 const props = defineProps({
     user: Object,
 });
 
-const editUser = (userId) => Inertia.get(route("users.edit", { id: userId }));
+const editUser = (userId) => Inertia.get(route("users.edit", { encryptedId: userId }));
 const goBack = () => Inertia.visit(route("users.index"));
 </script>
 
@@ -35,7 +35,7 @@ const goBack = () => Inertia.visit(route("users.index"));
                         <span class="hidden sm:block">
                             <button
                                 type="button"
-                                @click="editUser(user.id)"
+                                @click="editUser(base64UrlEncode(user.id.toString()))"
                                 class="inline-flex items-center rounded-full bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                             >
                                 Edit User
