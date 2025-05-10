@@ -147,7 +147,7 @@ const handlePageSizeChange = (e) => {
             ]"
         >
             <div class="datatable-info flex">
-                <div class="datatable-info flex">
+                <div v-if="users.last_page > 1" class="datatable-info flex">
                     <label>Page Size: </label>
                     <div class="control">
                         <div class="select">

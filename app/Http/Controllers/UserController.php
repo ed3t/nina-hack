@@ -106,15 +106,13 @@ class UserController extends Controller
         $validated = $this->validateUser($request);
 
         if ($validated->fails()) {
-            return Redirect::route('users.index')
+            return Redirect::route('users.create')
                 ->withErrors($validated)
                 ->withInput();
         }
 
-        // If validation passes, save the user
         $user = $this->saveUser($request);
 
-        // Return success message directly to the frontend and redirect to the user list
         return Redirect::route('users.index')->with('success', 'User updated successfully!');
     }
 
