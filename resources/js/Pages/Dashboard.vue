@@ -69,6 +69,7 @@ const handleSort = (column) => {
             pageSize: pageSize.value,
             sortColumn: sortColumn.value,
             sortDirection: sortDirection.value,
+            searchQuery: searchQuery.value,
         },
         {
             onFinish: () => {
@@ -96,6 +97,7 @@ const handleDelete = (id) => {
                 pageSize: pageSize.value,
                 sortColumn: sortColumn.value,
                 sortDirection: sortDirection.value,
+                searchQuery: searchQuery.value,
             });
             loading.value = false;
         },
@@ -115,6 +117,7 @@ const handlePageSizeChange = (newPageSize) => {
             pageSize: pageSize.value,
             sortColumn: sortColumn.value,
             sortDirection: sortDirection.value,
+            searchQuery: searchQuery.value,
         },
         {
             onFinish: () => {

@@ -71,11 +71,12 @@ export default {
         sortColumn: String,
         sortDirection: String,
         pageSize: Number,
+        searchQuery: String,
     },
     computed: {
         pageNumbers() {
             const pages = [];
-            const totalPages = this.users.last_page;
+            const totalPages = this.users.current_page + 9;
             const currentPage = this.users.current_page;
 
             let startPage = Math.max(currentPage - 2, 1);
@@ -99,6 +100,7 @@ export default {
             if (page >= 1 && page <= this.users.last_page) {
                 this.$inertia.get("/", {
                     page: page,
+                    search: this.searchQuery,
                     sortColumn: this.sortColumn,
                     sortDirection: this.sortDirection,
                     pageSize: this.pageSize,

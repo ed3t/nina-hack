@@ -99,6 +99,7 @@ class UserController extends Controller
             'pageSize' => $pageSize,
             'sortColumn' => $sortColumn,
             'sortDirection' => $sortDirection,
+            'search' => $search,
         ]);
     }
 
@@ -153,8 +154,13 @@ class UserController extends Controller
     public function search(Request $request): JsonResponse
     {
         $search = $request->input('search');
-        $perPage = 10;
-        $users = $this->searchUsers($search)->paginate($perPage);
+        $perPage = $request->input('pageSize', 10);
+        $sortColumn = $request->input('sortColumn', 'created_at');
+        $sortDirection = $request->input('sortDirection', 'desc');
+
+        $users = $this->searchUsers($search)
+            ->orderBy($sortColumn, $sortDirection)
+            ->paginate($perPage);
 
         return response()->json([
             'users' => $users,

@@ -170,6 +170,7 @@ const handlePageSizeChange = (e) => {
                 :sortColumn="sortColumn"
                 :sortDirection="sortDirection"
                 :pageSize="pageSize"
+                :searchQuery="searchQuery"
             />
         </div>
     </div>
