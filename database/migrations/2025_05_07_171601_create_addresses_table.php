@@ -18,7 +18,7 @@ class CreateAddressesTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('country');
             $table->string('city');
-            $table->string('post_code');
+            $table->string('postcode');
             $table->string('street');
             $table->timestamps();
 
