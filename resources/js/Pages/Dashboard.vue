@@ -27,16 +27,7 @@ const currentPage = ref(props.users.current_page);
 const searchQuery = ref("");
 const loading = ref(false);
 
-const defaultOptions = {
-    page: currentPage.value,
-    pageSize: pageSize.value,
-    sortColumn: sortColumn.value,
-    sortDirection: sortDirection.value,
-};
-
-const debouncedSearch = debounce(searchUsers, 300);
-
-async function searchUsers() {
+const debouncedSearch = debounce(async () => {
     if (searchQuery.value.length === 0) {
         users.value = props.users;
         return;
@@ -54,10 +45,12 @@ async function searchUsers() {
     } finally {
         loading.value = false;
     }
-}
+}, 300);
 
-const viewUser = (userId) => Inertia.get(route("users.show", { encryptedId: userId }));
-const editUser = (userId) => Inertia.get(route("users.edit", { encryptedId: userId }));
+const viewUser = (userId) =>
+    Inertia.get(route("users.show", { encryptedId: userId }));
+const editUser = (userId) =>
+    Inertia.get(route("users.edit", { encryptedId: userId }));
 
 const handleSort = (column) => {
     if (column === sortColumn.value) {
@@ -84,6 +77,7 @@ const handleSort = (column) => {
         },
     );
 };
+
 const handleDelete = (id) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
     loading.value = true;
@@ -91,15 +85,23 @@ const handleDelete = (id) => {
         preserveScroll: true,
         onSuccess: () => {
             toast.success("Deleted successfully!");
-            Inertia.get("/", defaultOptions);
-            loading.value = false;
         },
         onError: () => {
             loading.value = false;
             toast.error("Failed to delete user.");
         },
+        onFinish: () => {
+            Inertia.get("/", {
+                page: currentPage.value,
+                pageSize: pageSize.value,
+                sortColumn: sortColumn.value,
+                sortDirection: sortDirection.value,
+            });
+            loading.value = false;
+        },
     });
 };
+
 const handlePageSizeChange = (newPageSize) => {
     pageSize.value = newPageSize;
     currentPage.value = 1;

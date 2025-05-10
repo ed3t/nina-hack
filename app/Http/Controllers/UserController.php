@@ -74,7 +74,8 @@ class UserController extends Controller
 
     protected function searchUsers($search)
     {
-        return User::with('address')
+        return User::select('id', 'first_name', 'last_name', 'email', 'created_at')
+            ->with(['address:id,user_id,country,city,postcode,street'])
             ->when($search, function ($query) use ($search) {
                 return $query->where('first_name', 'like', "%$search%")
                     ->orWhere('last_name', 'like', "%$search%")
@@ -85,9 +86,9 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $search = $request->get('search');
-        $pageSize = $request->get('pageSize', default: 5);
-        $sortColumn = $request->get('sortColumn', default: 'created_at');
-        $sortDirection = $request->get('sortDirection', default: 'desc');
+        $pageSize = $request->get('pageSize', 10);
+        $sortColumn = $request->get('sortColumn', 'created_at');
+        $sortDirection = $request->get('sortDirection', 'desc');
 
         $users = $this->searchUsers($search)
             ->orderBy($sortColumn, $sortDirection)
