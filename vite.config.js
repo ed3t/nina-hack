@@ -14,4 +14,7 @@ export default defineConfig({
   resolve: {
     extensions: ['.js', '.vue', '.json'],
   },
+  build: {
+    outDir: 'public/build',
+  },
 });

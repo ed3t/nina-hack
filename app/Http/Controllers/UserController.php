@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Redirect;
 use Validator;
 
 class UserController extends Controller
@@ -65,52 +67,89 @@ class UserController extends Controller
             });
     }
 
+
     public function index(Request $request)
     {
         $search = $request->get('search');
-        $users = $this->searchUsers($search)->paginate(10);
+        $pageSize = $request->get('pageSize', default: 5);
+        $sortColumn = $request->get('sortColumn', default: 'created_at');
+        $sortDirection = $request->get('sortDirection', default: 'desc');
+
+        $users = $this->searchUsers($search)
+            ->orderBy($sortColumn, $sortDirection)
+            ->paginate($pageSize);
 
         return Inertia::render('Dashboard', [
             'users' => $users,
+            'pageSize' => $pageSize,
+            'sortColumn' => $sortColumn,
+            'sortDirection' => $sortDirection,
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $validated = $this->validateUser($request);
 
         if ($validated->fails()) {
-            return back()->withErrors($validated)->withInput();
+            return Redirect::route('users.index')
+                ->withErrors($validated)
+                ->withInput();
         }
 
-        $this->saveUser($request);
+        // If validation passes, save the user
+        $user = $this->saveUser($request);
 
-        return redirect()->route('users.index')->with('success', 'User added successfully');
+        // Return success message directly to the frontend and redirect to the user list
+        return Redirect::route('users.index')->with('success', 'User updated successfully!');
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id): RedirectResponse
     {
+        // Validate user input
         $validated = $this->validateUser($request, $id);
 
         if ($validated->fails()) {
-            return back()->withErrors($validated)->withInput();
+            return Redirect::route('users.edit', $id)
+                ->withErrors($validated)
+                ->withInput();
         }
 
-        $this->saveUser($request, $id);
+        $userData = $request->except('email');
 
-        return redirect()->route('users.index')->with('success', 'User updated successfully');
+        // Save the user
+        $user = $this->saveUser($request, $id);
+
+        return Redirect::route('users.edit', $id)->with('success', 'User updated successfully!')
+            ->with('user', $user);
     }
+
+    public function destroy($id): RedirectResponse
+    {
+        $user = User::findOrFail($id);
+
+        $user->address()->delete();
+        $user->delete();
+
+        return Redirect::route('users.index')->with('success', 'User deleted successfully!');
+    }
+
 
     public function search(Request $request): JsonResponse
     {
         $search = $request->input('search');
-        $users = $this->searchUsers($search)->paginate(10);
+        $perPage = 10;
+        $users = $this->searchUsers($search)->paginate($perPage);
 
-        return response()->json($users);
+        return response()->json([
+            'users' => $users,
+            'pageSize' => $perPage,
+        ]);
     }
 
     public function edit(User $user)
     {
+        $user = User::with('address')->findOrFail($user->id);
         return Inertia::render('UserForm', [
             'user' => $user
         ]);
@@ -125,4 +164,10 @@ class UserController extends Controller
         ]);
     }
 
+    public function create(User $user)
+    {
+        return Inertia::render('UserForm', [
+            'user' => $user
+        ]);
+    }
 }

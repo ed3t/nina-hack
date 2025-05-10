@@ -1,35 +1,75 @@
 <template>
-    <div v-if="users.last_page > 1">
-        <button
-            @click="goToPage(users.current_page - 1)"
-            :disabled="users.current_page === 1"
-        >
-            Previous
-        </button>
+    <ul :class="users.last_page > 1 ? '' : 'is-disabled'">
+        <li :class="{ 'is-disabled': users.current_page === 1 }">
+            <a
+                data-page="previous"
+                @click="goToPage(users.current_page - 1)"
+                :disabled="users.current_page === 1"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                >
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </a>
+        </li>
 
         <!-- Page numbers -->
-        <button
+        <li
             v-for="page in pageNumbers"
             :key="page"
-            @click="goToPage(page)"
-            :class="{'active': users.current_page === page}"
+            :class="[
+                'inner',
+                users.current_page === page ? 'active' : '',
+            ]"
         >
-            {{ page }}
-        </button>
+            <a
+                :data-page="page"
+                @click="goToPage(page)"
+                :disabled="users.current_page === page"
+            >
+                {{ page }}
+            </a>
+        </li>
 
-        <button
-            @click="goToPage(users.current_page + 1)"
-            :disabled="users.current_page === users.last_page"
+        <li
+            :class="users.current_page === users.last_page ? 'is-disabled' : ''"
         >
-            Next
-        </button>
-    </div>
+            <a
+                data-page="next"
+                @click="goToPage(users.current_page + 1)"
+                :disabled="users.current_page === users.last_page"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                >
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </a>
+        </li>
+    </ul>
 </template>
 
 <script>
 export default {
     props: {
         users: Object,
+        sortColumn: String,
+        sortDirection: String,
     },
     computed: {
         pageNumbers() {
@@ -56,17 +96,13 @@ export default {
     methods: {
         goToPage(page) {
             if (page >= 1 && page <= this.users.last_page) {
-                this.$inertia.get("/", { page: page });
+                this.$inertia.get("/", {
+                    page: page,
+                    sortColumn: this.sortColumn,
+                    sortDirection: this.sortDirection,
+                });
             }
         },
     },
 };
 </script>
-
-<style scoped>
-button.active {
-    font-weight: bold;
-    color: white;
-    background-color: #007bff;
-}
-</style>

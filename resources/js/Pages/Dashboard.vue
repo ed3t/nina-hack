@@ -1,21 +1,32 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed, watch } from "vue";
 import { Inertia } from "@inertiajs/inertia";
-import AppLayout from "@/Layouts/AppLayout.vue";
-import { Head } from "@inertiajs/inertia-vue3";
-import Pagination from "@/Components/Pagination.vue";
+import { Head, useForm } from "@inertiajs/inertia-vue3";
+import { useToast } from "vue-toastification";
 import { debounce } from "lodash";
-import Loader from "@/Components/ListLoader.vue";
 import axios from "axios";
+
+import AppLayout from "@/Layouts/AppLayout.vue";
+import DataTable from "@/Components/DataTable.vue";
+
+const form = useForm({});
+const toast = useToast();
 
 const props = defineProps({
     users: Object,
-    userDetails: Object,
+    pageSize: Number,
+    sortColumn: String,
+    sortDirection: String,
 });
 
 const users = ref(props.users);
+const sortColumn = ref(props.sortColumn);
+const sortDirection = ref(props.sortDirection);
+const pageSize = ref(props.pageSize);
+const currentPage = ref(props.users.current_page);
 const searchQuery = ref("");
 const loading = ref(false);
+
 const debouncedSearch = debounce(searchUsers, 300);
 
 async function searchUsers() {
@@ -30,7 +41,7 @@ async function searchUsers() {
         const response = await axios.get("/search", {
             params: { search: searchQuery.value },
         });
-        users.value = response.data;
+        users.value = response.data.users;
     } catch (error) {
         console.error("Error fetching search results:", error);
     } finally {
@@ -38,33 +49,80 @@ async function searchUsers() {
     }
 }
 
-function viewUser(userId) {
-    Inertia.get(`/users/${userId}`);
-}
+const viewUser = (userId) => Inertia.get(route('users.show', { id: userId }));
+const editUser = (userId) => Inertia.get(route('users.edit', { id: userId }));
+
+const handleSort = (column) => {
+  if (column === sortColumn.value) {
+    sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
+  } else {
+    sortColumn.value = column;
+    sortDirection.value = "asc";
+  }
+
+  loading.value = true;
+
+  Inertia.get("/", {
+    page: users.value.current_page,
+    sortColumn: sortColumn.value,
+    sortDirection: sortDirection.value,
+  }, {
+    onFinish: () => {
+      loading.value = false;
+    },
+  });
+};
+const handleDelete = (id) => {
+    if (!confirm("Are you sure you want to delete this user?")) return;
+    loading.value = true;
+    form.delete(route('users.destroy', { id }), {
+        preserveScroll: true,
+        onSuccess: () => {
+            toast.success('Deleted successfully!');
+            Inertia.get("/")
+            loading.value = false;
+        },
+        onError: () => {
+            loading.value = false;
+            toast.error('Failed to delete user.');
+        }
+    });
+};
+const handlePageSizeChange = (newPageSize) => {
+  pageSize.value = newPageSize;
+  currentPage.value = 1;
+
+  loading.value = true;
+
+  Inertia.get("/", {
+    page: currentPage.value,
+    pageSize: pageSize.value,
+    sortColumn: sortColumn.value,
+    sortDirection: sortDirection.value,
+  }, {
+    onFinish: () => {
+      loading.value = false;
+    },
+  });
+};
 </script>
 
 <template>
     <Head title="Dashboard" />
-    <AppLayout>
-        <h1>User Dashboard</h1>
-        <input
-            v-model="searchQuery"
-            placeholder="Search Users..."
-            @input="debouncedSearch"
+    <AppLayout :isEdit="false">
+        <DataTable
+            :viewUser="viewUser"
+            :editUser="editUser"
+            :loading="loading"
+            :users="users"
+            :debouncedSearch="debouncedSearch"
+            :pageSize="pageSize"
+            :handleSort="handleSort"
+            :sortColumn="sortColumn"
+            :sortDirection="sortDirection"
+            :handleDelete="handleDelete"
+            @update:pageSize="handlePageSizeChange"
+            v-model:searchQuery="searchQuery"
         />
-
-        <div v-if="loading">
-            <Loader />
-        </div>
-
-        <div v-if="users.data && users.data.length && !loading">
-            <div v-for="user in users.data" :key="user.id">
-                <p @click="viewUser(user.id)">
-                    {{ user.first_name }} {{ user.last_name }}
-                </p>
-            </div>
-        </div>
-
-        <Pagination :users="users" />
     </AppLayout>
 </template>
