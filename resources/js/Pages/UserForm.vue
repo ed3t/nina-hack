@@ -36,24 +36,27 @@ function submitForm() {
     submitLoading.value = true;
     if (isEdit.value) {
         form.put(route("users.update", { encryptedId: base64UrlEncode(props.user.id.toString()) }), {
+            preserveScroll: true,
             onSuccess: () => {
                 toast.success("User updated successfully!");
                 submitLoading.value = false;
+                Inertia.visit(route("users.show", { encryptedId: base64UrlEncode(props.user.id.toString()) }));
             },
             onError: (errors) => {
-                toast.error("Failed to update user!");
+                // toast.error("Failed to update user!");
                 submitLoading.value = false;
                 console.log(errors);
             },
         });
     } else {
         form.post(route("users.store"), {
+            preserveScroll: true,
             onSuccess: () => {
                 toast.success("User created successfully!");
                 submitLoading.value = false;
             },
             onError: (errors) => {
-                toast.error("Failed to create user!");
+                // toast.error("Failed to create user!");
                 submitLoading.value = false;
                 console.log(errors);
             },
@@ -100,12 +103,12 @@ function submitForm() {
                                 autocomplete="given-name"
                                 v-model="form.first_name"
                                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-1 focus:-outline-offset-1 focus:outline-indigo-600 sm:text-sm/6"
-                                required
+
                             />
-                            <span
+                            <small
                                 v-if="form.errors.first_name"
-                                class="text-red-500"
-                                >{{ form.errors.first_name }}</span
+                                class="text-pink-500"
+                                >{{ form.errors.first_name }}</small
                             >
                         </div>
                     </div>
@@ -124,12 +127,12 @@ function submitForm() {
                                 v-model="form.last_name"
                                 autocomplete="family-name"
                                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-1 focus:-outline-offset-1 focus:outline-indigo-600 sm:text-sm/6"
-                                required
+
                             />
-                            <span
+                            <small
                                 v-if="form.errors.last_name"
-                                class="text-red-500"
-                                >{{ form.errors.last_name }}</span
+                                class="text-pink-500"
+                                >{{ form.errors.last_name }}</small
                             >
                         </div>
                     </div>
@@ -148,13 +151,13 @@ function submitForm() {
                                 autocomplete="email"
                                 v-model="form.email"
                                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-1 focus:-outline-offset-1 focus:outline-indigo-600 sm:text-sm/6"
-                                required
+
                                 :disabled="props.user.id"
                             />
-                            <span
+                            <small
                                 v-if="form.errors.email"
-                                class="text-red-500"
-                                >{{ form.errors.email }}</span
+                                class="text-pink-500"
+                                >{{ form.errors.email }}</small
                             >
                         </div>
                     </div>
@@ -205,10 +208,10 @@ function submitForm() {
                                 autocomplete="street-address"
                                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-1 focus:-outline-offset-1 focus:outline-indigo-600 sm:text-sm/6"
                             />
-                            <span
+                            <small
                                 v-if="form.errors.street"
-                                class="text-red-500"
-                                >{{ form.errors.street }}</span
+                                class="text-pink-500"
+                                >{{ form.errors.street }}</small
                             >
                         </div>
                     </div>
@@ -228,10 +231,10 @@ function submitForm() {
                                 autocomplete="address-level2"
                                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-1 focus:-outline-offset-1 focus:outline-indigo-600 sm:text-sm/6"
                             />
-                            <span
+                            <small
                                 v-if="form.errors.city"
-                                class="text-red-500"
-                                >{{ form.errors.city }}</span
+                                class="text-pink-500"
+                                >{{ form.errors.city }}</small
                             >
                         </div>
                     </div>
@@ -251,10 +254,10 @@ function submitForm() {
                                 autocomplete="postal-code"
                                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-1 focus:-outline-offset-1 focus:outline-indigo-600 sm:text-sm/6"
                             />
-                            <span
+                            <small
                                 v-if="form.errors.postcode"
-                                class="text-red-500"
-                                >{{ form.errors.postcode }}</span
+                                class="text-pink-500"
+                                >{{ form.errors.postcode }}</small
                             >
                         </div>
                     </div>

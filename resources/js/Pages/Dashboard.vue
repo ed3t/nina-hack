@@ -17,6 +17,7 @@ const props = defineProps({
     pageSize: Number,
     sortColumn: String,
     sortDirection: String,
+    search: String,
 });
 
 const users = ref(props.users);
@@ -24,7 +25,7 @@ const sortColumn = ref(props.sortColumn);
 const sortDirection = ref(props.sortDirection);
 const pageSize = ref(props.pageSize);
 const currentPage = ref(props.users.current_page);
-const searchQuery = ref("");
+const searchQuery = ref(props.search || "");
 const loading = ref(false);
 
 const debouncedSearch = debounce(async () => {
@@ -36,7 +37,7 @@ const debouncedSearch = debounce(async () => {
     loading.value = true;
 
     try {
-        const response = await axios.get("/search", {
+        const response = await axios.get(route("users.search"), {
             params: { search: searchQuery.value },
         });
         users.value = response.data.users;
@@ -66,10 +67,10 @@ const handleSort = (column) => {
         "/",
         {
             page: currentPage.value,
-            pageSize: pageSize.value,
-            sortColumn: sortColumn.value,
-            sortDirection: sortDirection.value,
-            searchQuery: searchQuery.value,
+            size: pageSize.value,
+            column: sortColumn.value,
+            direction: sortDirection.value,
+            search: searchQuery.value,
         },
         {
             onFinish: () => {
@@ -92,12 +93,12 @@ const handleDelete = (id) => {
             toast.error("Failed to delete user.");
         },
         onFinish: () => {
-            Inertia.get("/", {
+            Inertia.get(route("users.index"), {
                 page: currentPage.value,
-                pageSize: pageSize.value,
-                sortColumn: sortColumn.value,
-                sortDirection: sortDirection.value,
-                searchQuery: searchQuery.value,
+                size: pageSize.value,
+                column: sortColumn.value,
+                direction: sortDirection.value,
+                search: searchQuery.value,
             });
             loading.value = false;
         },
@@ -111,13 +112,13 @@ const handlePageSizeChange = (newPageSize) => {
     loading.value = true;
 
     Inertia.get(
-        "/",
+        route("users.index"),
         {
             page: currentPage.value,
-            pageSize: pageSize.value,
-            sortColumn: sortColumn.value,
-            sortDirection: sortDirection.value,
-            searchQuery: searchQuery.value,
+            size: pageSize.value,
+            column: sortColumn.value,
+            direction: sortDirection.value,
+            search: searchQuery.value,
         },
         {
             onFinish: () => {

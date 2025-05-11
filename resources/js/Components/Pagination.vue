@@ -25,10 +25,7 @@
         <li
             v-for="page in pageNumbers"
             :key="page"
-            :class="[
-                'inner',
-                users.current_page === page ? 'active' : '',
-            ]"
+            :class="['inner', users.current_page === page ? 'active' : '']"
         >
             <a
                 :data-page="page"
@@ -75,22 +72,20 @@ export default {
     },
     computed: {
         pageNumbers() {
-            const pages = [];
-            const totalPages = this.users.current_page + 9;
-            const currentPage = this.users.current_page;
+            const { last_page: totalPages, current_page: currentPage } =
+                this.users;
 
-            let startPage = Math.max(currentPage - 2, 1);
-            let endPage = Math.min(currentPage + 2, totalPages);
+            const startPage = Math.max(currentPage - 2, 1);
+            const endPage = Math.min(currentPage + 2, totalPages);
 
-            if (currentPage > 3) {
-                pages.push(1);
-            }
-            for (let i = startPage; i <= endPage; i++) {
-                pages.push(i);
-            }
-            if (currentPage < totalPages - 2) {
-                pages.push(totalPages);
-            }
+            const pages = [
+                ...(startPage > 2 ? ["..."] : []),
+                ...Array.from(
+                    { length: endPage - startPage + 1 },
+                    (_, i) => startPage + i,
+                ),
+                ...(endPage < totalPages - 1 ? ["..."] : []),
+            ];
 
             return pages;
         },
@@ -98,12 +93,12 @@ export default {
     methods: {
         goToPage(page) {
             if (page >= 1 && page <= this.users.last_page) {
-                this.$inertia.get("/", {
+                this.$inertia.get(route("users.index"), {
                     page: page,
                     search: this.searchQuery,
-                    sortColumn: this.sortColumn,
-                    sortDirection: this.sortDirection,
-                    pageSize: this.pageSize,
+                    column: this.sortColumn,
+                    direction: this.sortDirection,
+                    size: this.pageSize,
                 });
             }
         },
